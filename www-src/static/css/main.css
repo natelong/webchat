@@ -1,26 +1,18 @@
-body{
-	font-family: Helvetica;
-	font-size: 18px;
-}
-input[name=chat]{
-	font-size: inherit;
-	width: 280px;
-}
 .output-wrapper{
 	position: relative;
 	height: 400px;
-	width: 320px;
-	overflow: hidden;
-	box-shadow: 0 0 5px rgba( 0, 0, 0, 0.5 ) inset;
+	width: 100%;
+	overflow: auto;
+	border: 1px solid #ccc;
+	margin: 0 0 5px 0;
 }
 .output{
-	width: 300px;
-	padding: 10px;
+	width: 100%;
 	position: absolute;
 	bottom: 0px;
 }
 .message{
-	padding: 3px;
+	padding: 3px 10px;
 	border-bottom: 1px solid #ccc;
 }
 .mine{
