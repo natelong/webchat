@@ -4,21 +4,35 @@ import(
 	"net/http"
 	"log"
 	"websocket"
+	"encoding/json"
+	"./app/bin/chat"
 )
 
-type subscription struct {
-	conn		*websocket.Conn
-	subscribe	bool
+type Subscription struct {
+	Connection	*websocket.Conn
+	Subscribe	string
+	User 		*User
+}
+
+type User struct {
+	ID 			string
+	Channels	[]string
+	Name 		string
+}
+
+type MessageData struct{
+	Type 		string
+	Data 		map [ string ] interface{}
 }
 
 type message struct {
-	conn 		*websocket.Conn
-	text		[]byte
+	Connection	*websocket.Conn
+	Body 		MessageData
 }
 
 var messageChan = make( chan message )
-var subscriptionChan = make( chan subscription )
-var conns = make( map[*websocket.Conn]int )
+var subscriptionChan = make( chan *Subscription )
+var subscriptions = make( map[ string ]*Subscription )
 
 func main(){
 	go pubHub()
@@ -29,7 +43,7 @@ func main(){
 	http.HandleFunc( "/css/", serveStaticFile )
 	http.HandleFunc( "/", serveIndex )
 
-	http.Handle( "/event", websocket.Handler( doEventStream ) )
+	http.Handle( "/chat", websocket.Handler( doEventStream ) )
 
 	err := http.ListenAndServe( ":8080", nil )
 	if err != nil {
@@ -37,12 +51,83 @@ func main(){
 	}
 }
 
-func Publish( message []byte, connection *websocket.Conn ){
-	for conn, _ := range conns{
-		if conn != connection {
-			if _, err := conn.Write( message ); err != nil {
-				conn.Close()
-			}
+func Broadcast( newMessage MessageData ){
+	messageObj, _ := json.Marshal( newMessage )
+
+	for _, sub := range subscriptions{
+		_, err := sub.Connection.Write( messageObj )
+		if err != nil {
+			sub.Connection.Close()
+		}
+	}
+}
+
+// this is dangerous right now. Anyone can update anyone's name, etc
+func AcknowledgeStart( message MessageData ){
+	ID, _ := message.Data[ "ID" ].( string )
+	Name, _ := message.Data[ "Name" ].( string )
+	//Channels, _ := message.Data[ "Channels" ].( []string )
+
+	subscriptions[ ID ].User.Name = Name
+
+	SendUserList()
+}
+
+func SendUserList(){
+	message := new( MessageData )
+	message.Type = "userList"
+	message.Data = make( map[string]interface{} )
+	
+	count := 0
+	users := make( []string, len( subscriptions ) )
+	for _, sub := range subscriptions {
+		if sub.User.Name == "" {
+			continue
+		}
+		users[ count ] = sub.User.Name
+		count += 1
+	}
+
+	message.Data[ "Users" ] = users[ 0:count ]
+	Broadcast( *message )
+}
+
+func doEventStream( ws *websocket.Conn ){
+	ID := chat.UUID()
+	defer func(){
+		subscriptionChan <- &Subscription{ ws, chat.REMOVE_CONNECTION, &User{ ID, nil, "" } }
+		ws.Close()
+	}()
+
+	subscriptionChan <- &Subscription{ ws, chat.ADD_CONNECTION, &User{ ID, nil, "" } }
+	newStartMessage, _ :=  json.Marshal(
+		MessageData{
+			"start",
+			map[string]interface{}{
+				"ID": ID,
+			} } )
+
+	ws.Write( newStartMessage )
+
+	for{
+		buf := make( []byte, 1024 )
+
+		n, err := ws.Read( buf )
+		if err != nil {
+			log.Println( "Error reading from websocket connection: ", err.Error() )
+			break;
+		}
+
+		newMessageData := new( MessageData )
+		err = json.Unmarshal( buf[ 0:n ], newMessageData )
+
+		if err != nil {
+			log.Println( "Error unmarshaling message: ", string( buf[ 0:n ] ), " : ", err.Error() )
+		}
+
+		messageChan <- message{
+			ws,
+			*newMessageData,
 		}
 	}
 }
@@ -50,42 +135,25 @@ func Publish( message []byte, connection *websocket.Conn ){
 func pubHub(){
 	for{
 		message := <- messageChan
-		Publish( message.text, message.conn )
+		switch message.Body.Type {
+			case "acknowledgeStart":
+				log.Println( "Acknowledging connection start" )
+				AcknowledgeStart( message.Body )
+			case "message":
+				log.Println( "New Message" )
+				Broadcast( message.Body )
+		}
 	}
 }
 
 func subHub(){
 	for{
-		subscription := <- subscriptionChan
-
-		if subscription.subscribe {
-			conns[ subscription.conn ] = 1
+		sub := <- subscriptionChan
+		if sub.Subscribe == chat.ADD_CONNECTION {
+			subscriptions[ sub.User.ID ] = sub
 		}else{
-			delete( conns, subscription.conn )
-		}
-	}
-}
-
-func doEventStream( ws *websocket.Conn ){
-	defer func(){
-		subscriptionChan <- subscription{ ws, false }
-		ws.Close()
-	}()
-
-	subscriptionChan <- subscription{ ws, true }
-
-	for{
-		buf := make( []byte, 512 )
-
-		n, err := ws.Read( buf )
-		if err != nil {
-			log.Println( "Error reading from websocket connection" )
-			break;
-		}
-
-		messageChan <- message{
-			ws,
-			buf[ 0:n ],
+			delete( subscriptions, sub.User.ID )
+			SendUserList()
 		}
 	}
 }

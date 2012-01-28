@@ -1,6 +1,8 @@
 webchat.Service = {};
 
-webchat.Service.url = 'ws://' + window.location.host + '/event';
+#include "ServiceActions.js"
+
+webchat.Service.url = 'ws://' + window.location.host + '/chat';
 webchat.Service.recentMessageCount = 25;
 
 webchat.Service.init = function init(){
@@ -14,6 +16,14 @@ webchat.Service.init = function init(){
 	webchat.Service.ws = ws;
 };
 
+webchat.Service.send = function send( message ){
+	if( typeof message !== 'string' ){
+		message = JSON.stringify( message );
+	}
+
+	webchat.Service.ws.send( message );
+};
+
 webchat.Service.callbacks = {};
 
 webchat.Service.callbacks.onOpen = function onOpen( event ){
@@ -24,23 +34,20 @@ webchat.Service.callbacks.onClose = function onClose( event ){
 	console.log( 'Websocket connection closed: %o', event );
 };
 
-webchat.Service.callbacks.onMessage = function onMessage( message ){
-	if( message.data ){
-		var response = JSON.parse( message.data );
-		var className = 'notmine';
-	}else{
-		var className = 'mine';
-		var response = message;
-	}
-
-	if( response.type === 'message' ){
-		var output = document.querySelector( '.output' )
-		output.innerHTML += '<div class="message ' + className + '">' + response.text + '</div>';
-	}else{
-		console.log( response );
+webchat.Service.callbacks.onMessage = function onMessage( rawMessage ){
+	message = JSON.parse( rawMessage.data );
+	
+	if( message.Type in webchat.Service.Actions ){
+		webchat.Service.Actions[ message.Type ]( message );
 	}
 };
 
 webchat.Service.callbacks.onError = function onError( event ){
 	console.error( 'Websocket error: %o', event );
 };
+
+
+
+
+
+

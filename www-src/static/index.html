@@ -13,20 +13,56 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="span10">
-				<div class="output-wrapper"><div class="output"><!></div></div>
+			<div class="span8">
+				<ul class="nav tabs">
+					<li class="active"><a href="#general" data-toggle="tab">General</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="output-wrapper tab-pane active"><div class="output"><!></div></div>
+				</div>
 				<form id="chat" class="form-inline">
-					<input class="span9" type="text" name="chat" placeholder="Type message here..." />
+					<input class="span7" type="text" name="chat" placeholder="Type message here..." />
 					<input class="btn primary span1" type="submit" value="Go!" />
 				</form>
 			</div>
-			<div class="span2">
-				<ul class="unstyled">
-					<li><a href="#" id="changeNameLink">Change Name</a></li>
+			<div class="span4">
+				<ul class="nav tabs">
+					<li class="active"><a href="#chatInfo" data-toggle="tab">Chat</a></li>
+					<li><a href="#settings" data-toggle="tab">Settings</a></li>
 				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="chatInfo">
+						Chat info goes here...
+					</div>
+					<div class="tab-pane" id="settings">
+						<form class="form-inline">
+							<label>Username</label>
+							<input type="text" value="Nate" class="span4 inline-edit" name="username" id="username" disabled="disabled" />
+							<div class="form-actions">
+								<input class="btn primary" type="submit" value="Save" />
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
+	<form class="form-vertical" id="chatStartInfoForm">
+		<div class="modal" id="startupModal">
+			<div class="modal-header">
+				<h3>Get Started</h3>
+			</div>
+			<div class="modal-body">
+				<label for="modalUsername">Pick a username:</label>
+				<input type="text" id="modalUsername" name="name" placeholder="e.g. Joe Bob" tabindex="1" />
+				<label for="modalChannel">Choose a chat channel (optional):</label>
+				<input type="text" id="modalChannel" name="channel" value="general" />
+			</div>
+			<div class="modal-footer">
+				<input type="submit" id="chatStartInfoButton" class="btn primary" value="Let's do this!" />
+			</div>
+		</div>
+	</form>
 	<script src="js/webchat.js"></script>
 </body>
 </html>
