@@ -19,7 +19,7 @@ cleanpreprocessor:
 	@rm -rf .qpp-remote-cache
 
 # Main app files
-app/bin/webchat: app/bin/webchat.6
+app/bin/webchat: app/bin/chat.6 app/bin/webchat.6
 	@mkdir -p app/bin
 	@$(linker) -o app/bin/webchat app/bin/webchat.6
 	@rm app/bin/*.6
@@ -27,6 +27,10 @@ app/bin/webchat: app/bin/webchat.6
 app/bin/webchat.6: app/webchat.go
 	@mkdir -p app/bin
 	@$(compiler) -o app/bin/webchat.6 app/webchat.go
+
+app/bin/chat.6: app/chat.go
+	@mkdir -p app/bin
+	@$(compiler) -o app/bin/chat.6 app/chat.go
 
 js:
 	@mkdir -p www/js
