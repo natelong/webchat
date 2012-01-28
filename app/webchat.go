@@ -41,6 +41,7 @@ func main(){
 	http.HandleFunc( "/favicon.ico", favicon )
 	http.HandleFunc( "/js/", serveStaticFile )
 	http.HandleFunc( "/css/", serveStaticFile )
+	http.HandleFunc( "/img/", serveStaticFile )
 	http.HandleFunc( "/", serveIndex )
 
 	http.Handle( "/chat", websocket.Handler( doEventStream ) )
