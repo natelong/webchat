@@ -143,6 +143,9 @@ func pubHub(){
 			case "message":
 				log.Println( "New Message" )
 				Broadcast( message.Body )
+			case "getUserList":
+				log.Println( "GetUserList" )
+				SendUserList();
 		}
 	}
 }
