@@ -1,0 +1,30 @@
+{namespace webchat.templates}
+
+/**
+ * Chat tab
+ * @param channel The name of the chat channel
+ */
+{template .chatTab}
+<div class="tab-pane" id="{$channel}">
+	<div class="row">
+		<div class="span9">
+			<div class="output-wrapper"><div class="{$channel} output"><!></div></div>
+		</div>
+		<div class="span3">
+			<h3>Channel Info</h3>
+			<h4>Users</h4>
+			<div class="chat-info">
+				Waiting to initialize
+			</div>
+		</div>
+	</div>
+</div>
+{/template}
+
+/**
+ * Chat tab navigation
+ * @param channel The name of the chat channel
+ */
+{template .chatTabNav}
+<li class="tab-button"><a href="#{$channel}" data-toggle="tab">{$channel}</a></li>
+{/template}

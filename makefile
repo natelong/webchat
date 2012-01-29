@@ -32,7 +32,11 @@ app/bin/chat.6: app/chat.go
 	@mkdir -p app/bin
 	@$(compiler) -o app/bin/chat.6 app/chat.go
 
-js:
+# Scripts
+templates:
+	@java -jar bin/SoyToJsSrcCompiler.jar  --outputPathFormat www-src/js/templates.js www-src/templates/chat.soy
+
+js: templates
 	@mkdir -p www/js
 	@java -jar bin/$(preprocessor) www-src/js/webchat.js www/js/webchat.js
 
