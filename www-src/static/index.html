@@ -14,24 +14,11 @@
 		</div>
 		<div class="row">
 			<div class="span12">
-				<ul class="nav tabs">
-					<li class="active"><a href="#general" data-toggle="tab">General</a></li>
-					<li><a href="#addChannel"><i class="icon plus"><!></i></a></li>
+				<ul class="nav tabs" id="chatTabNavContainer">
+					<li id="addChannelTab"><a href="#addChannel"><i class="icon plus"><!></i></a></li>
 				</ul>
-				<div class="tab-content">
-					<div class="row">
-						<div class="span9">
-							<div class="output-wrapper tab-pane active"><div class="output"><!></div></div>
-						</div>
-						<div class="span3">
-							<h3>Channel Info</h3>
-							<h4>Users</h4>
-							<div class="tab-pane active" id="chatInfo">
-								Waiting to initialize
-							</div>
-						</div>
-					</div>
-				</div>
+			</div>
+			<div class="span12 tab-content" id="chatTabContainer">
 			</div>
 		</div>
 		<div class="row">
@@ -50,11 +37,25 @@
 			<div class="modal-body">
 				<label for="modalUsername">Pick a username:</label>
 				<input type="text" id="modalUsername" name="name" placeholder="e.g. Joe Bob" tabindex="1" />
-				<label for="modalChannel">Choose a chat channel (optional):</label>
-				<input type="text" id="modalChannel" name="channel" value="general" />
+				<label for="modalChannel">Choose a starting chat channel (optional):</label>
+				<input type="text" id="modalChannel" name="channel" placeholder="e.g. Releases" />
 			</div>
 			<div class="modal-footer">
-				<input type="submit" id="chatStartInfoButton" class="btn primary" value="Let's do this!" />
+				<input type="submit" class="btn primary" value="Let's do this!" />
+			</div>
+		</div>
+	</form>
+	<form class="form-vertical hidden" id="newChannelForm">
+		<div class="modal" id="newChannelModal">
+			<div class="modal-header">
+				<h3>Join or Create a channel</h3>
+			</div>
+			<div class="modal-body">
+				<label for="newChannelName">Channel Name:</label>
+				<input type="text" id="newChannelName" name="channel" placeholder="e.g. Releases" tabindex="1" />
+			</div>
+			<div class="modal-footer">
+				<input type="submit" class="btn primary" value="Does that work?" />
 			</div>
 		</div>
 	</form>

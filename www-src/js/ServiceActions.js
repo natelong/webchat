@@ -1,17 +1,19 @@
 webchat.Service.Actions = {};
 
 webchat.Service.Actions.message = function message( message ){
+	var i, len;
 	if( message.Data.Name === webchat.User.Name ){
 		className = 'mine';
 	}else{
 		className = 'notmine'
 	}
-	var output = document.querySelector( '.output' )
-	output.innerHTML +=
+
+	$( '#' + message.Data.Channel + ' .output' ).append(
 		'<div class="message ' + className + '">' +
 		'<strong>' + message.Data.Name + '</strong>' +
 		': ' + message.Data.Text +
-		'</div>';
+		'</div>'
+	);
 };
 
 webchat.Service.Actions.start = function start( message ){
@@ -27,8 +29,6 @@ webchat.Service.Actions.start = function start( message ){
 };
 
 webchat.Service.Actions.userList = function userList( message ){
-	console.log( 'User List: %o', message );
-
 	var i, len;
 	var userListHTML = '';
 	var getUserHTML = function getUserHTML( user ){
@@ -39,5 +39,14 @@ webchat.Service.Actions.userList = function userList( message ){
 		userListHTML += getUserHTML( message.Data.Users[ i ] );
 	}
 
-	document.querySelector( '#chatInfo' ).innerHTML = userListHTML;
+	$('.chat-info').html( userListHTML );
+};
+
+webchat.Service.Actions.getUserList = function getUserList(){
+	webchat.Service.send({
+		Type: "getUserList",
+		Data: {
+			ID: webchat.User.ID
+		}
+	});
 };

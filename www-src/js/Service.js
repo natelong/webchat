@@ -27,7 +27,7 @@ webchat.Service.send = function send( message ){
 webchat.Service.callbacks = {};
 
 webchat.Service.callbacks.onOpen = function onOpen( event ){
-	//webchat.Service.ws.send( JSON.stringify( { action: "getRecent", count: webchat.Service.recentMessageCount } ) );
+	console.log( "Connection Opened" );
 };
 
 webchat.Service.callbacks.onClose = function onClose( event ){
@@ -43,11 +43,5 @@ webchat.Service.callbacks.onMessage = function onMessage( rawMessage ){
 };
 
 webchat.Service.callbacks.onError = function onError( event ){
-	console.error( 'Websocket error: %o', event );
+	console.error( 'Connection Closed: %o', event );
 };
-
-
-
-
-
-
